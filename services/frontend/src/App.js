@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useReducer, useRef, useState} from 'react';
 import {useCallbackRef} from 'use-callback-ref';
 import Dialog from 'react-bootstrap-dialog'
 
@@ -35,8 +35,10 @@ function Sessions(props) {
     );
 }
 
+
 function Home() {
     const [sessions, setSessions] = useState([]);
+    const nameRef = useRef(null);
     const formRef = useRef(null);
     const dialogueRef = useRef(null);
 
@@ -51,12 +53,19 @@ function Home() {
 
     async function handleSubmit(event) {
         event.preventDefault();
+
+        // Submit to server
         const data = new FormData(formRef.current);
-        const response_create = await fetch("/api/sessions", {
+        await fetch("/api/sessions", {
             'method': 'POST',
             body: data
         });
+
+        // Refresh sessions
         await loadSessions();
+
+        // Clear game name
+        nameRef.current.value = ""
     }
 
     // On delete an existing session
@@ -89,6 +98,7 @@ function Home() {
                             type="text"
                             name="name"
                             id="name"
+                            ref={nameRef}
                         />
                         <FormControl
                             placeholder="Guardian Crossword Number"
